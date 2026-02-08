@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Love</title>
+    
+    <!-- Importing nice fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Importing Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(116.82deg, #ff94e7 0%, #27cbff 100%);
+            font-family: 'Nunito', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        /* Floating Hearts Background */
+        .hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .heart {
+            position: absolute;
+            bottom: -100px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.5);
+            clip-path: path('M15 28S28.5 17 28.5 9a6.5 6.5 0 00-12-3.7A6.5 6.5 0 004.5 9c0 8 13.5 19 13.5 19z');
+            animation: float 6s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 90%;
+            width: 400px;
+            transition: transform 0.5s ease;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .photo-frame {
+            width: 100%;
+            height: 250px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transform: rotate(-3deg);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            font-family: 'Nunito', sans-serif;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: #d63384;
+        }
+
+        /* Screens */
+        .hidden { display: none; }
+        
+        #noBtn {
+            background: #6c757d;
+            margin-left: 10px;
+            position: relative;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Audio -->
+    <!-- REPLACE 'music.mp3' with your own file if you uploaded one, or keep this link -->
+    <audio id="bgMusic" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="hearts" id="heartContainer"></div>
+
+    <!-- SCREEN 1: INTRO -->
+    <div class="container" id="screen1">
+        <h1>Hey Beautiful</h1>
+        <p>I wanna fulfill your wish...</p>
+        <button onclick="startJourney()">Stab my Heart❤️🔪</button>
+    </div>
+
+    <!-- SCREEN 2: MEMORIES (Slideshow) -->
+    <div class="container hidden" id="screen2">
+        <div class="photo-frame">
+            <!-- CHANGE THE IMAGE SOURCES HERE TO YOUR PHOTOS (photo1.jpg, etc) -->
+            <img id="slideImg" src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?ixlib=rb-4.0.3" alt="Memory">
+        </div>
+        <p id="slideText">But but, I have one last wish. Won't you ask ? </p>
+        <button onclick="nextSlide()">Know my final wish -></button>
+    </div>
+
+    <!-- SCREEN 3: PROPOSAL -->
+    <div class="container hidden" id="screen3">
+        <h1>Will you be marry me, lolu?</h1>
+        <p>I promise to give you the princess treatment every single day of my life. <br>Happy Propose Day!</p>
+        <div>
+            <button id="yesBtn" onclick="celebrate()">YES!</button>
+            <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()">No</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 4: SUCCESS -->
+    <div class="container hidden" id="screen4">
+        <h1>Yes! Yayyyyyy, I knew it!! 💍</h1>
+        <p>I love you so much my cutipie! ❤️</p>
+        <div class="photo-frame" style="transform: rotate(3deg);">
+            <img src="D:\\Website\\propose day\\us7.jpeg"  alt="Happy">
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        // Add your personalized messages and photo links here
+        const slides = [
+            { 
+                text: "But but, I have one last wish. Won't you ask ?", 
+                img: "D:\\Website\\propose day\\us2.jpeg" // Replace with photo1.jpg
+            },
+            { 
+                text: "But Before that I want just want you to know that", 
+                img: "D:\\Website\\propose day\\me.jpeg" // Replace with photo2.jpg
+            },
+            { 
+                text: "You are the cutest thing ever happened to me. And I wanna keep you forever.", 
+                img: "D:\\Website\\propose day\\she.jpeg" // Replace with photo3.jpg
+            },
+            { 
+                text: "I want this", 
+                img: "D:\\Website\\propose day\\us1.jpeg" // Replace with photo4.jpg
+            },
+            { 
+                text: "I want this too", 
+                img: "D:\\Website\\propose day\\us3.jpeg" // Replace with photo5.jpg
+            },
+            { 
+                text: "And this too", 
+                img: "D:\\Website\\propose day\\us4.jpeg" // Replace with photo6.jpg
+            },
+            { 
+                text: "And this one too", 
+                img: "D:\\Website\\propose day\\us5.jpeg" // Replace with photo7.jpg
+            },
+            { 
+                text: "And this one too. So my final wish isss...", 
+                img: "D:\\Website\\propose day\\us6.jpeg" // Replace with photo7.jpg
+            }
+        ];
+
+        let currentSlide = 0;
+        const music = document.getElementById('bgMusic');
+
+        function startJourney() {
+            document.getElementById('screen1').classList.add('hidden');
+            document.getElementById('screen2').classList.remove('hidden');
+            // Try to play music
+            music.volume = 0.5;
+            music.play().catch(error => console.log("Music play failed:", error));
+            showSlide(0);
+        }
+
+        function showSlide(index) {
+            const img = document.getElementById('slideImg');
+            const text = document.getElementById('slideText');
+            img.src = slides[index].img;
+            text.innerText = slides[index].text;
+        }
+
+        function nextSlide() {
+            currentSlide++;
+            if (currentSlide < slides.length) {
+                showSlide(currentSlide);
+            } else {
+                document.getElementById('screen2').classList.add('hidden');
+                document.getElementById('screen3').classList.remove('hidden');
+            }
+        }
+
+        // Moving the No Button
+        function moveButton() {
+            const noBtn = document.getElementById('noBtn');
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+        }
+
+        // Confetti Celebration
+        function celebrate() {
+            document.getElementById('screen3').classList.add('hidden');
+            document.getElementById('screen4').classList.remove('hidden');
+            
+            // Trigger confetti
+            var duration = 5 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: 0.1, y: 0.6 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: 0.9, y: 0.6 } }));
+            }, 250);
+        }
+
+        // Background Hearts Generation
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            document.getElementById('heartContainer').appendChild(heart);
+            setTimeout(() => {
+                heart.remove();
+            }, 6000);
+        }
+        setInterval(createHeart, 300);
+
+    </script>
+</body>
+</html>
